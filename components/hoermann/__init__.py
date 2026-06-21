@@ -3,7 +3,8 @@ import esphome.config_validation as cv
 from esphome.components import uart
 from esphome.const import CONF_ID
 
-DEPENDENCIES = ["uart"]
+AUTO_LOAD = ["binary_sensor", "cover"]
+DEPENDENCsIES = ["uart"]
 MULTI_CONF = True
 
 CONF_HOERMANN_ID = "hoermann_id"
