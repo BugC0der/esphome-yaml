@@ -1,27 +1,27 @@
 import esphome.codegen as cg
 import esphome.config_validation as cv
-from esphome.components import binary_sensor
+from esphome.components import binary_sensor 
 from esphome.const import CONF_TYPE
 from . import HoermannHub, CONF_HOERMANN_ID
 
 DEPENDENCIES = ["hoermann"]
 
 TYPES = {
-    "light": "set_light",
-    "error": "set_error",
-    "venting": "set_venting",
-    "prewarn": "set_prewarn",
-    "option_relay": "set_option_relay",
+    "error": cg.RawExpression("esphome::hoermann::HoermannBinarySensor::Error"),
+    "prewarn": cg.RawExpression("esphome::hoermann::HoermannBinarySensor::Prewarn"),
+    "option_relay": cg.RawExpression("esphome::hoermann::HoermannBinarySensor::OptionRelay"),
 }
 
-CONFIG_SCHEMA = binary_sensor.binary_sensor_schema().extend(
-    {
-        cv.GenerateID(CONF_HOERMANN_ID): cv.use_id(HoermannHub),
-        cv.Required(CONF_TYPE): cv.enum(TYPES, lower=True),
-    }
-)
+hoermann_ns = cg.esphome_ns.namespace("hoermann")
+HoermannBinarySensor = hoermann_ns.class_("HoermannBinarySensor", binary_sensor.BinarySensor, cg.Component)
+
+CONFIG_SCHEMA = binary_sensor.binary_sensor_schema(HoermannBinarySensor).extend({
+    cv.GenerateID(CONF_HOERMANN_ID): cv.use_id(HoermannHub),
+    cv.Required(CONF_TYPE): cv.enum(TYPES, lower=True),
+}).extend(cv.COMPONENT_SCHEMA)
 
 async def to_code(config):
-    var = await binary_sensor.new_binary_sensor(config)
+    enum_value = TYPES[config[CONF_TYPE]]
     hub = await cg.get_variable(config[CONF_HOERMANN_ID])
-    cg.add(getattr(hub, TYPES[config[CONF_TYPE]])(var))
+    var = await binary_sensor.new_binary_sensor(config, hub, enum_value)
+    await cg.register_component(var, config)
