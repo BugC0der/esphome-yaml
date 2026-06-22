@@ -2,7 +2,7 @@ import esphome.codegen as cg
 import esphome.config_validation as cv
 from esphome.components import switch
 from esphome.const import CONF_TYPE
-from . import HoermannHub, CONF_HOERMANN_ID
+from . import HoermannHub, CONF_HOERMANN_ID, CONF_HOERMANN_ID_DEFAULT
 
 DEPENDENCIES = ["hoermann"]
 
@@ -15,7 +15,7 @@ hoermann_ns = cg.esphome_ns.namespace("hoermann")
 HoermannSwitch = hoermann_ns.class_("HoermannSwitch", switch.Switch, cg.Component)
 
 CONFIG_SCHEMA = switch.switch_schema(HoermannSwitch).extend({
-    cv.GenerateID(CONF_HOERMANN_ID): cv.use_id(HoermannHub),
+    cv.Optional(CONF_HOERMANN_ID, default=CONF_HOERMANN_ID_DEFAULT): cv.use_id(HoermannHub),
     cv.Required(CONF_TYPE): cv.enum(TYPES, lower=True),
 }).extend(cv.COMPONENT_SCHEMA)
 
